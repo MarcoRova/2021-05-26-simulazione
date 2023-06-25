@@ -7,6 +7,7 @@ package it.polito.tdp.yelp;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Model;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -35,13 +36,13 @@ public class FXMLController {
     private Button btnPercorso; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCitta"
-    private ComboBox<?> cmbCitta; // Value injected by FXMLLoader
+    private ComboBox<String> cmbCitta; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtX"
     private TextField txtX; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbAnno"
-    private ComboBox<?> cmbAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbLocale"
     private ComboBox<?> cmbLocale; // Value injected by FXMLLoader
@@ -56,11 +57,34 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	
+    	this.txtResult.clear();
 
+    	String city = this.cmbCitta.getValue();
+    	Integer anno = this.cmbAnno.getValue();
+    	
+    	if(city == null || anno == null) {
+    		this.txtResult.appendText("Selezionare una città e un anno per continuare.");
+    		return;
+    	}
+    	
+    	this.model.creaGrafo(city, anno);
+    	this.txtResult.appendText(this.model.getInfoGrafo());
+    	
     }
 
     @FXML
     void doLocaleMigliore(ActionEvent event) {
+    	
+    	this.txtResult.clear();
+    	if(this.model.getGrafo() == null) {
+    		this.txtResult.appendText("Creare prima il grafo!");
+    		return;
+    	}
+    	
+    	Business best = this.model.trovaMigliore();
+    	
+    	this.txtResult.appendText("LOCALE MIGLIORE: "+ best.getBusinessName());
 
     }
 
@@ -78,5 +102,10 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	this.cmbCitta.getItems().addAll(this.model.getAllCities());
+    	
+    	for(int i=2005; i<=2013; i++) {
+    		this.cmbAnno.getItems().add(i);
+    	}
     }
 }
